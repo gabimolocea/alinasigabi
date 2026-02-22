@@ -1,0 +1,30 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #faf7f2;
+  --foreground: #3d2b1f;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: 'Lato', sans-serif;
+}
+
+h1, h2, h3, h4 {
+  font-family: 'Playfair Display', serif;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  .font-playfair {
+    font-family: 'Playfair Display', serif;
+  }
+  .font-lato {
+    font-family: 'Lato', sans-serif;
+  }
+}
