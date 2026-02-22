@@ -49,13 +49,25 @@ export default function AdminPage() {
     if (authenticated) fetchRSVPs();
   }, [authenticated, fetchRSVPs]);
 
-  function handleLogin(e: React.FormEvent) {
+  async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
-    if (password === "admin2025") {
-      setAuthenticated(true);
-      setAuthError("");
-    } else {
-      setAuthError("Parolă incorectă.");
+    setLoading(true);
+    setAuthError("");
+    try {
+      const res = await fetch("/api/admin/auth", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password }),
+      });
+      if (res.ok) {
+        setAuthenticated(true);
+      } else {
+        setAuthError("Parolă incorectă.");
+      }
+    } catch {
+      setAuthError("Eroare de conexiune. Încercați din nou.");
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -140,9 +152,10 @@ export default function AdminPage() {
             {authError && <p className="font-lato text-red-500 text-sm mb-3 text-center">{authError}</p>}
             <button
               type="submit"
-              className="w-full bg-[#b76e79] text-white font-lato tracking-widest uppercase text-sm py-3 rounded-full hover:bg-[#a05c67] transition-colors"
+              disabled={loading}
+              className="w-full bg-[#b76e79] text-white font-lato tracking-widest uppercase text-sm py-3 rounded-full hover:bg-[#a05c67] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              Intră
+              {loading ? "Se verifică..." : "Intră"}
             </button>
           </form>
         </div>
