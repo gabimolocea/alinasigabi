@@ -3,8 +3,15 @@
 @tailwind utilities;
 
 :root {
-  --background: #faf7f2;
-  --foreground: #3d2b1f;
+  --background: #1a0a10;
+  --foreground: #f5e6d3;
+  --burgundy: #6B1024;
+  --burgundy-dark: #4A0B18;
+  --burgundy-deep: #2D0710;
+  --gold: #D4A843;
+  --gold-light: #F0D78C;
+  --gold-dark: #B8922E;
+  --cream: #F5E6D3;
 }
 
 body {
@@ -17,6 +24,46 @@ h1, h2, h3, h4 {
   font-family: 'Playfair Display', serif;
 }
 
+/* Shiny Gold Title Effect */
+.shiny-gold {
+  background: linear-gradient(
+    105deg,
+    #B8922E 0%,
+    #D4A843 20%,
+    #F0D78C 40%,
+    #FFFBE6 50%,
+    #F0D78C 60%,
+    #D4A843 80%,
+    #B8922E 100%
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 4s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% center;
+  }
+  100% {
+    background-position: -200% center;
+  }
+}
+
+/* Gold border glow */
+.gold-border {
+  border: 1px solid var(--gold);
+  box-shadow: 0 0 15px rgba(212, 168, 67, 0.15), inset 0 0 15px rgba(212, 168, 67, 0.05);
+}
+
+/* Gold ornament divider */
+.gold-divider {
+  color: var(--gold);
+  opacity: 0.7;
+}
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;
@@ -26,5 +73,8 @@ h1, h2, h3, h4 {
   }
   .font-lato {
     font-family: 'Lato', sans-serif;
+  }
+  .font-greatvibes {
+    font-family: 'Great Vibes', cursive;
   }
 }

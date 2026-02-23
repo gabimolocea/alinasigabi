@@ -15,6 +15,7 @@ const config: Config = {
       fontFamily: {
         playfair: ["'Playfair Display'", "serif"],
         lato: ["'Lato'", "sans-serif"],
+        greatvibes: ["'Great Vibes'", "cursive"],
       },
     },
   },

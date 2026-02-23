@@ -23,8 +23,36 @@ db.exec(`
     phone TEXT,
     message TEXT,
     table_number INTEGER,
+    invitation_code TEXT,
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
   )
 `);
+
+// Add invitation_code column if it doesn't exist (for existing DBs)
+try {
+  db.exec(`ALTER TABLE rsvps ADD COLUMN invitation_code TEXT`);
+} catch {
+  // column already exists
+}
+
+// Create invitation_codes table for valid codes
+db.exec(`
+  CREATE TABLE IF NOT EXISTS invitation_codes (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    code TEXT NOT NULL UNIQUE,
+    guest_name TEXT,
+    max_persons INTEGER NOT NULL DEFAULT 10,
+    used INTEGER NOT NULL DEFAULT 0,
+    status TEXT NOT NULL DEFAULT 'draft',
+    phone TEXT,
+    notes TEXT,
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+  )
+`);
+
+// Add status column if missing (for existing DBs)
+try { db.exec(`ALTER TABLE invitation_codes ADD COLUMN status TEXT NOT NULL DEFAULT 'draft'`); } catch { /* exists */ }
+try { db.exec(`ALTER TABLE invitation_codes ADD COLUMN phone TEXT`); } catch { /* exists */ }
+try { db.exec(`ALTER TABLE invitation_codes ADD COLUMN notes TEXT`); } catch { /* exists */ }
 
 export default db;
