@@ -87,7 +87,7 @@ export default function Home() {
             href="/rsvp"
             className="inline-block bg-[#D4A843] text-[#4A0B18] font-lato tracking-widest uppercase text-xs sm:text-sm px-8 sm:px-10 py-3 sm:py-4 rounded-full hover:bg-[#F0D78C] transition-colors duration-300 shadow-lg font-bold"
           >
-            Confirmă Prezența
+            Vei participa?
           </Link>
         </div>
 
@@ -113,7 +113,7 @@ export default function Home() {
             href="/rsvp"
             className="inline-block bg-[#D4A843] text-[#4A0B18] font-lato tracking-widest uppercase text-sm px-12 py-5 rounded-full hover:bg-[#F0D78C] transition-colors duration-300 shadow-lg font-bold"
           >
-            Confirmă Prezența
+            Vei participa?
           </Link>
         </div>
       </section>

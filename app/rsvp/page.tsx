@@ -4,7 +4,7 @@ import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 
-type MenuPref = "normal" | "vegetarian" | "vegan";
+type MenuPref = "normal" | "vegetarian-cu-peste" | "vegetarian-fara-peste" | "vegan" | "copii";
 
 interface FormData {
   name: string;
@@ -20,8 +20,10 @@ interface FormData {
 
 const menuLabels: Record<MenuPref, string> = {
   normal: "Normal",
-  vegetarian: "Vegetarian",
+  "vegetarian-cu-peste": "Vegetarian cu pește",
+  "vegetarian-fara-peste": "Vegetarian fără pește",
   vegan: "Vegan",
+  copii: "Meniu copii",
 };
 
 export default function RSVPPage() {
@@ -170,7 +172,9 @@ function RSVPContent() {
           <div className="text-5xl mb-6">☘</div>
           <h2 className="font-playfair shiny-gold text-3xl mb-4">Mulțumim!</h2>
           <p className="font-lato text-[#F5E6D3] text-base leading-relaxed mb-8">
-            Răspunsul vostru a fost înregistrat cu succes. Ne bucurăm să vă avem alături în ziua noastră specială!
+            {form.attending === "no"
+              ? "Ne bucurăm că sunteți cu sufletul alături de noi în ziua noastră specială!"
+              : "Ne bucurăm să vă avem alături în ziua noastră specială!"}
           </p>
           <Link
             href="/"
@@ -202,7 +206,7 @@ function RSVPContent() {
             <span className="text-[#D4A843] text-3xl">☘</span>
           </div>
 
-          <h1 className="font-greatvibes shiny-gold text-5xl md:text-6xl mb-3">Confirmare Prezență</h1>
+          <h1 className="font-greatvibes shiny-gold text-5xl md:text-6xl mb-3">Te astept cu drag!</h1>
           
           <div className="flex items-center justify-center gap-4 mb-6">
             <div className="h-px w-16 bg-[#D4A843] opacity-50" />
@@ -265,14 +269,14 @@ function RSVPContent() {
         <div className="mt-6 mb-3">
           <span className="text-[#D4A843] text-2xl">☘</span>
         </div>
-        <h1 className="font-greatvibes shiny-gold text-4xl md:text-5xl mb-3">Confirmare Prezență</h1>
+        <h1 className="font-greatvibes shiny-gold text-4xl md:text-5xl mb-3">Te astept cu drag!</h1>
         <div className="flex items-center justify-center gap-4 mb-4">
           <div className="h-px w-16 bg-[#D4A843] opacity-50" />
           <span className="text-[#D4A843] text-xl">✦</span>
           <div className="h-px w-16 bg-[#D4A843] opacity-50" />
         </div>
         <p className="font-lato text-[#F5E6D3] max-w-md mx-auto text-sm leading-relaxed opacity-80">
-          Vă rugăm să completați formularul de mai jos până pe <strong className="text-[#F0D78C]">26 Iunie 2026</strong>.
+          Completeaza formularul de mai jos pentru a ma anunta decizia ta
         </p>
         <p className="font-lato text-[#D4A843] text-xs mt-2 tracking-widest">
           COD: {invitationCode.trim().toUpperCase()}
@@ -290,7 +294,22 @@ function RSVPContent() {
             required
             value={form.name}
             onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-            placeholder="Prenume Nume"
+            placeholder="Nume și Prenume SAU Familia ..."
+            className="w-full bg-[#2D0710] border border-[#D4A843] border-opacity-30 rounded-xl px-4 py-3 font-lato text-[#F5E6D3] placeholder-[#F5E6D3] placeholder-opacity-30 focus:outline-none focus:ring-2 focus:ring-[#D4A843] focus:border-transparent transition"
+          />
+        </div>
+
+        {/* Phone */}
+        <div className="mb-6">
+          <label className="block font-lato text-[#D4A843] text-xs font-bold mb-2 tracking-widest uppercase">
+            Număr de telefon *
+          </label>
+          <input
+            type="tel"
+            required
+            value={form.phone}
+            onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))}
+            placeholder="07xx xxx xxx"
             className="w-full bg-[#2D0710] border border-[#D4A843] border-opacity-30 rounded-xl px-4 py-3 font-lato text-[#F5E6D3] placeholder-[#F5E6D3] placeholder-opacity-30 focus:outline-none focus:ring-2 focus:ring-[#D4A843] focus:border-transparent transition"
           />
         </div>
@@ -300,23 +319,69 @@ function RSVPContent() {
           <label className="block font-lato text-[#D4A843] text-xs font-bold mb-3 tracking-widest uppercase">
             Veți participa? *
           </label>
-          <div className="flex gap-6">
-            {[
-              { val: "yes", label: "Da, voi fi prezent(ă)" },
-              { val: "no", label: "Nu pot participa" },
-            ].map(({ val, label }) => (
-              <label key={val} className="flex items-center gap-2 cursor-pointer font-lato text-[#F5E6D3] text-sm">
+          <div className="flex flex-col gap-3">
+            <label className="flex items-center gap-2 cursor-pointer font-lato text-[#F5E6D3] text-sm">
+              <input
+                type="checkbox"
+                checked={form.attending_church}
+                onChange={(e) => {
+                  const checked = e.target.checked;
+                  setForm((f) => ({
+                    ...f,
+                    attending_church: checked,
+                    attending: checked || f.attending_party ? "yes" : "no",
+                  }));
+                }}
+                className="accent-[#D4A843] w-4 h-4"
+              />
+              Da, voi fi prezent(ă) la cununia religioasă
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer font-lato text-[#F5E6D3] text-sm">
+              <input
+                type="checkbox"
+                checked={form.attending_party}
+                onChange={(e) => {
+                  const checked = e.target.checked;
+                  setForm((f) => ({
+                    ...f,
+                    attending_party: checked,
+                    attending: f.attending_church || checked ? "yes" : "no",
+                  }));
+                }}
+                className="accent-[#D4A843] w-4 h-4"
+              />
+              Da, voi fi prezent(ă) la petrecere
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer font-lato text-[#F5E6D3] text-sm">
+              <input
+                type="checkbox"
+                checked={form.attending === "no"}
+                onChange={(e) => {
+                  if (e.target.checked) {
+                    setForm((f) => ({
+                      ...f,
+                      attending: "no",
+                      attending_church: false,
+                      attending_party: false,
+                      need_accommodation: false,
+                    }));
+                  }
+                }}
+                className="accent-[#D4A843] w-4 h-4"
+              />
+              Nu pot participa
+            </label>
+            {form.attending === "yes" && (
+              <label className="flex items-center gap-2 cursor-pointer font-lato text-[#F5E6D3] text-sm mt-1">
                 <input
-                  type="radio"
-                  name="attending"
-                  value={val}
-                  checked={form.attending === val}
-                  onChange={() => setForm((f) => ({ ...f, attending: val }))}
+                  type="checkbox"
+                  checked={form.need_accommodation}
+                  onChange={(e) => setForm((f) => ({ ...f, need_accommodation: e.target.checked }))}
                   className="accent-[#D4A843] w-4 h-4"
                 />
-                {label}
+                Am nevoie de cazare
               </label>
-            ))}
+            )}
           </div>
         </div>
 
@@ -325,7 +390,7 @@ function RSVPContent() {
             {/* Num persons */}
             <div className="mb-6">
               <label className="block font-lato text-[#D4A843] text-xs font-bold mb-2 tracking-widest uppercase">
-                Număr de persoane *
+                Alege număr de persoane (inclusiv copii) *
               </label>
               <input
                 type="number"
@@ -350,7 +415,7 @@ function RSVPContent() {
                       Persoana {idx + 1}:
                     </span>
                     <div className="flex gap-4 flex-wrap">
-                      {(["normal", "vegetarian", "vegan"] as MenuPref[]).map((opt) => (
+                      {(["normal", "vegetarian-cu-peste", "vegetarian-fara-peste", "vegan", "copii"] as MenuPref[]).map((opt) => (
                         <label key={opt} className="flex items-center gap-1.5 cursor-pointer font-lato text-[#F5E6D3] text-sm">
                           <input
                             type="radio"
@@ -369,86 +434,10 @@ function RSVPContent() {
               </div>
             </div>
 
-            {/* Church */}
-            <div className="mb-6">
-              <label className="block font-lato text-[#D4A843] text-xs font-bold mb-3 tracking-widest uppercase">
-                Participați la cununia religioasă?
-              </label>
-              <div className="flex gap-6">
-                {[true, false].map((val) => (
-                  <label key={String(val)} className="flex items-center gap-2 cursor-pointer font-lato text-[#F5E6D3] text-sm">
-                    <input
-                      type="radio"
-                      name="attending_church"
-                      checked={form.attending_church === val}
-                      onChange={() => setForm((f) => ({ ...f, attending_church: val }))}
-                      className="accent-[#D4A843] w-4 h-4"
-                    />
-                    {val ? "Da" : "Nu"}
-                  </label>
-                ))}
-              </div>
-              <p className="font-lato text-[#F5E6D3] opacity-40 text-xs mt-1">Biserica „Sf. Sava", ora 12:30</p>
-            </div>
 
-            {/* Party */}
-            <div className="mb-6">
-              <label className="block font-lato text-[#D4A843] text-xs font-bold mb-3 tracking-widest uppercase">
-                Participați la petrecere?
-              </label>
-              <div className="flex gap-6">
-                {[true, false].map((val) => (
-                  <label key={String(val)} className="flex items-center gap-2 cursor-pointer font-lato text-[#F5E6D3] text-sm">
-                    <input
-                      type="radio"
-                      name="attending_party"
-                      checked={form.attending_party === val}
-                      onChange={() => setForm((f) => ({ ...f, attending_party: val }))}
-                      className="accent-[#D4A843] w-4 h-4"
-                    />
-                    {val ? "Da" : "Nu"}
-                  </label>
-                ))}
-              </div>
-              <p className="font-lato text-[#F5E6D3] opacity-40 text-xs mt-1">Hotel Pleiada &quot;Sala Atlas&quot;, ora 16:00</p>
-            </div>
-
-            {/* Accommodation */}
-            <div className="mb-6">
-              <label className="block font-lato text-[#D4A843] text-xs font-bold mb-3 tracking-widest uppercase">
-                Aveți nevoie de cazare?
-              </label>
-              <div className="flex gap-6">
-                {[true, false].map((val) => (
-                  <label key={String(val)} className="flex items-center gap-2 cursor-pointer font-lato text-[#F5E6D3] text-sm">
-                    <input
-                      type="radio"
-                      name="need_accommodation"
-                      checked={form.need_accommodation === val}
-                      onChange={() => setForm((f) => ({ ...f, need_accommodation: val }))}
-                      className="accent-[#D4A843] w-4 h-4"
-                    />
-                    {val ? "Da" : "Nu"}
-                  </label>
-                ))}
-              </div>
-            </div>
           </>
         )}
 
-        {/* Phone */}
-        <div className="mb-6">
-          <label className="block font-lato text-[#D4A843] text-xs font-bold mb-2 tracking-widest uppercase">
-            Număr de telefon (opțional)
-          </label>
-          <input
-            type="tel"
-            value={form.phone}
-            onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))}
-            placeholder="07xx xxx xxx"
-            className="w-full bg-[#2D0710] border border-[#D4A843] border-opacity-30 rounded-xl px-4 py-3 font-lato text-[#F5E6D3] placeholder-[#F5E6D3] placeholder-opacity-30 focus:outline-none focus:ring-2 focus:ring-[#D4A843] focus:border-transparent transition"
-          />
-        </div>
 
         {/* Message */}
         <div className="mb-8">
