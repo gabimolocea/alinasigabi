@@ -24,20 +24,36 @@ export async function POST(request: NextRequest) {
       attending_party,
       phone,
       message,
+      guest_id,
       invitation_code,
     } = body;
 
-    if (!name || attending === undefined || !num_persons || !invitation_code) {
+    if (!name || attending === undefined || !num_persons) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
-    // Validate invitation code
-    const code = db.prepare("SELECT * FROM invitation_codes WHERE code = ?").get(invitation_code) as { id: number; code: string; max_persons: number; used: number } | undefined;
-    if (!code) {
-      return NextResponse.json({ error: "Cod de invitație invalid." }, { status: 400 });
-    }
-    if (code.used) {
-      return NextResponse.json({ error: "Acest cod de invitație a fost deja folosit." }, { status: 400 });
+    // Resolve the invitation code from guest_id or direct code
+    let resolvedCode: string | null = null;
+
+    if (guest_id) {
+      const guest = db.prepare("SELECT * FROM invitation_codes WHERE id = ?").get(guest_id) as { id: number; code: string; used: number } | undefined;
+      if (!guest) {
+        return NextResponse.json({ error: "Invitatul nu a fost găsit." }, { status: 400 });
+      }
+      if (guest.used) {
+        return NextResponse.json({ error: "Acest invitat a confirmat deja prezența." }, { status: 400 });
+      }
+      resolvedCode = guest.code;
+    } else if (invitation_code) {
+      // Legacy code-based flow
+      const code = db.prepare("SELECT * FROM invitation_codes WHERE code = ?").get(invitation_code) as { id: number; code: string; used: number } | undefined;
+      if (!code) {
+        return NextResponse.json({ error: "Cod de invitație invalid." }, { status: 400 });
+      }
+      if (code.used) {
+        return NextResponse.json({ error: "Acest cod de invitație a fost deja folosit." }, { status: 400 });
+      }
+      resolvedCode = code.code;
     }
 
     const stmt = db.prepare(`
@@ -55,11 +71,14 @@ export async function POST(request: NextRequest) {
       attending_party || 0,
       phone || null,
       message || null,
-      invitation_code
+      resolvedCode
     );
 
     // Mark code as used and update status
-    db.prepare("UPDATE invitation_codes SET used = 1, status = 'confirmed' WHERE code = ?").run(invitation_code);
+    if (resolvedCode) {
+      const newStatus = attending === 1 ? 'confirmed' : 'declined';
+      db.prepare("UPDATE invitation_codes SET used = 1, status = ? WHERE code = ?").run(newStatus, resolvedCode);
+    }
 
     return NextResponse.json({ id: result.lastInsertRowid }, { status: 201 });
   } catch (error) {

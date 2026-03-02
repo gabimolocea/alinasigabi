@@ -40,21 +40,21 @@ db.exec(`
   )
 `);
 
-// Sample invitation codes
-const codes = [
+// Sample guests (name-based RSVP - no code needed by guests)
+const guests = [
   { code: 'AG2026-001', guest_name: 'Familie Popescu', max_persons: 4 },
   { code: 'AG2026-002', guest_name: 'Familie Ionescu', max_persons: 3 },
   { code: 'AG2026-003', guest_name: 'Familie Georgescu', max_persons: 2 },
-  { code: 'AG2026-004', guest_name: null, max_persons: 2 },
-  { code: 'AG2026-005', guest_name: null, max_persons: 2 },
+  { code: 'AG2026-004', guest_name: 'Andrei și Maria Stanciu', max_persons: 2 },
+  { code: 'AG2026-005', guest_name: 'Alexandru Marinescu', max_persons: 2 },
   { code: 'TEST', guest_name: 'Test Invitat', max_persons: 5 },
 ];
 
 const stmt = db.prepare('INSERT OR IGNORE INTO invitation_codes (code, guest_name, max_persons) VALUES (?, ?, ?)');
 
-for (const c of codes) {
-  stmt.run(c.code, c.guest_name, c.max_persons);
-  console.log(`✓ Added code: ${c.code} (${c.guest_name || 'no name'}, max ${c.max_persons})`);
+for (const g of guests) {
+  stmt.run(g.code, g.guest_name, g.max_persons);
+  console.log(`✓ Added guest: ${g.guest_name} (max ${g.max_persons})`);
 }
 
 console.log('\nDone! Invitation codes seeded.');

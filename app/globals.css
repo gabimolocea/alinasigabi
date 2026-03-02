@@ -3,20 +3,21 @@
 @tailwind utilities;
 
 :root {
-  --background: #1a0a10;
-  --foreground: #f5e6d3;
-  --burgundy: #6B1024;
-  --burgundy-dark: #4A0B18;
-  --burgundy-deep: #2D0710;
-  --gold: #D4A843;
-  --gold-light: #F0D78C;
-  --gold-dark: #B8922E;
-  --cream: #F5E6D3;
+  --background: #F5F0EA;
+  --foreground: #4A4540;
+  --gold: #9B8557;
+  --gold-light: #B8A67A;
+  --gold-dark: #7A6B42;
+  --cream: #F5F0EA;
+  --cream-dark: #EDE8E1;
+  --cream-deeper: #E5DFD6;
+  --text-muted: #7A7268;
 }
 
 body {
   color: var(--foreground);
-  background: var(--background);
+  background-color: var(--background);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Cg fill='%23d4c4a8' fill-opacity='0.22'%3E%3Cpath d='M0 0h80v80H0V0zm20 20v40h40V20H20zm20 35a15 15 0 1 0 0-30 15 15 0 0 0 0 30z' fill-rule='evenodd'/%3E%3C/g%3E%3C/svg%3E");
   font-family: 'Lato', sans-serif;
 }
 
@@ -24,38 +25,81 @@ h1, h2, h3, h4 {
   font-family: 'Playfair Display', serif;
 }
 
-/* Shiny Gold Title Effect */
+/* Elegant Gold Title */
 .shiny-gold {
   background: linear-gradient(
     105deg,
-    #B8922E 0%,
-    #D4A843 20%,
-    #F0D78C 40%,
-    #FFFBE6 50%,
-    #F0D78C 60%,
-    #D4A843 80%,
-    #B8922E 100%
+    #7A6B42 0%,
+    #9B8557 15%,
+    #B8A67A 30%,
+    #D4C494 45%,
+    #E8DCBA 50%,
+    #D4C494 55%,
+    #B8A67A 70%,
+    #9B8557 85%,
+    #7A6B42 100%
   );
   background-size: 200% 100%;
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  animation: shimmer 4s ease-in-out infinite;
+  animation: shimmer 14s ease-in-out infinite;
 }
 
 @keyframes shimmer {
   0% {
     background-position: 200% center;
   }
+  40% {
+    background-position: -200% center;
+  }
   100% {
     background-position: -200% center;
   }
 }
 
-/* Gold border glow */
+/* Shiny gold button */
+.btn-shiny-gold {
+  background: linear-gradient(
+    105deg,
+    #7A6B42 0%,
+    #9B8557 20%,
+    #B8A67A 40%,
+    #D4C494 50%,
+    #B8A67A 60%,
+    #9B8557 80%,
+    #7A6B42 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 14s ease-in-out infinite;
+  color: white;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.15);
+  box-shadow: 0 2px 12px rgba(155, 133, 87, 0.3);
+  transition: box-shadow 0.3s ease;
+}
+.btn-shiny-gold:hover {
+  box-shadow: 0 4px 20px rgba(155, 133, 87, 0.5);
+}
+
+/* Double border frame - matching invitation */
+.invitation-frame {
+  position: relative;
+  border: 1.5px solid var(--gold);
+  outline: 1.5px solid var(--gold);
+  outline-offset: 6px;
+}
+
+/* Gold border */
 .gold-border {
   border: 1px solid var(--gold);
-  box-shadow: 0 0 15px rgba(212, 168, 67, 0.15), inset 0 0 15px rgba(212, 168, 67, 0.05);
+  box-shadow: 0 2px 12px rgba(155, 133, 87, 0.08);
+}
+
+/* Double gold border */
+.gold-border-double {
+  border: 1.5px solid var(--gold);
+  outline: 1.5px solid var(--gold);
+  outline-offset: 5px;
 }
 
 /* Gold ornament divider */

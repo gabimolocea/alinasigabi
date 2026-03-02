@@ -73,6 +73,14 @@ export async function PUT(request: NextRequest) {
 
     if (status) {
       db.prepare("UPDATE invitation_codes SET status = ? WHERE id = ?").run(status, id);
+      // If status is changed away from confirmed/declined, reset used flag and delete RSVP so guest can re-confirm
+      if (status !== "confirmed" && status !== "declined") {
+        db.prepare("UPDATE invitation_codes SET used = 0 WHERE id = ?").run(id);
+        const inv = db.prepare("SELECT code FROM invitation_codes WHERE id = ?").get(id) as { code: string } | undefined;
+        if (inv) {
+          db.prepare("DELETE FROM rsvps WHERE invitation_code = ?").run(inv.code);
+        }
+      }
     }
     if (guest_name !== undefined) {
       db.prepare("UPDATE invitation_codes SET guest_name = ? WHERE id = ?").run(guest_name, id);
