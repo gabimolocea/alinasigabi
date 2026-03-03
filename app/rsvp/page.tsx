@@ -209,7 +209,7 @@ function RSVPContent() {
                 setSearchName(e.target.value);
                 setSelectedGuest(null);
               }}
-              placeholder="ex: Gabriel Molocea sau Familia Molocea"
+              placeholder="ex: Ion Popescu sau Familia Popescu"
               autoFocus
               className="w-full bg-[#F5F0EA] border border-[#9B8557] border-opacity-30 rounded-sm px-4 py-3 font-lato text-[#4A4540] placeholder-[#7A7268] placeholder-opacity-50 focus:outline-none focus:ring-2 focus:ring-[#9B8557] focus:border-transparent transition text-center text-lg"
             />
@@ -284,7 +284,7 @@ function RSVPContent() {
             required
             value={form.name}
             onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-            placeholder="ex: Gabriel Molocea sau Familia Molocea"
+            placeholder="ex: Ion Popescu sau Familia Popescu"
             className="w-full bg-[#F5F0EA] border border-[#9B8557] border-opacity-30 rounded-sm px-4 py-3 font-lato text-[#4A4540] placeholder-[#7A7268] placeholder-opacity-50 focus:outline-none focus:ring-2 focus:ring-[#9B8557] focus:border-transparent transition"
           />
         </div>
@@ -302,6 +302,9 @@ function RSVPContent() {
             placeholder="07xx xxx xxx"
             className="w-full bg-[#F5F0EA] border border-[#9B8557] border-opacity-30 rounded-sm px-4 py-3 font-lato text-[#4A4540] placeholder-[#7A7268] placeholder-opacity-50 focus:outline-none focus:ring-2 focus:ring-[#9B8557] focus:border-transparent transition"
           />
+          <p className="font-lato text-[#7A7268] text-xs mt-1.5 opacity-70">
+            📱 Vei primi un SMS de confirmare pe acest număr
+          </p>
         </div>
 
         {/* Attending */}

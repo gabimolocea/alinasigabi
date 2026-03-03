@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import db from "@/lib/db";
+import db, { dbReady } from "@/lib/db";
+import { sendConfirmationSMS } from "@/lib/sms";
 
 export async function GET() {
   try {
-    const rows = db.prepare("SELECT * FROM rsvps ORDER BY created_at DESC").all();
-    return NextResponse.json(rows);
+    await dbReady;
+    const result = await db.execute("SELECT * FROM rsvps ORDER BY created_at DESC");
+    return NextResponse.json(result.rows);
   } catch (error) {
     console.error(error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
@@ -13,6 +15,7 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
+    await dbReady;
     const body = await request.json();
     const {
       name,
@@ -36,7 +39,8 @@ export async function POST(request: NextRequest) {
     let resolvedCode: string | null = null;
 
     if (guest_id) {
-      const guest = db.prepare("SELECT * FROM invitation_codes WHERE id = ?").get(guest_id) as { id: number; code: string; used: number } | undefined;
+      const guestResult = await db.execute({ sql: "SELECT * FROM invitation_codes WHERE id = ?", args: [guest_id] });
+      const guest = guestResult.rows[0] as unknown as { id: number; code: string; used: number } | undefined;
       if (!guest) {
         return NextResponse.json({ error: "Invitatul nu a fost găsit." }, { status: 400 });
       }
@@ -45,8 +49,8 @@ export async function POST(request: NextRequest) {
       }
       resolvedCode = guest.code;
     } else if (invitation_code) {
-      // Legacy code-based flow
-      const code = db.prepare("SELECT * FROM invitation_codes WHERE code = ?").get(invitation_code) as { id: number; code: string; used: number } | undefined;
+      const codeResult = await db.execute({ sql: "SELECT * FROM invitation_codes WHERE code = ?", args: [invitation_code] });
+      const code = codeResult.rows[0] as unknown as { id: number; code: string; used: number } | undefined;
       if (!code) {
         return NextResponse.json({ error: "Cod de invitație invalid." }, { status: 400 });
       }
@@ -56,31 +60,37 @@ export async function POST(request: NextRequest) {
       resolvedCode = code.code;
     }
 
-    const stmt = db.prepare(`
-      INSERT INTO rsvps (name, attending, num_persons, menu_preferences, need_accommodation, attending_church, attending_party, phone, message, invitation_code)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `);
-
-    const result = stmt.run(
-      name,
-      attending,
-      num_persons,
-      menu_preferences || "[]",
-      need_accommodation || 0,
-      attending_church || 0,
-      attending_party || 0,
-      phone || null,
-      message || null,
-      resolvedCode
-    );
+    const result = await db.execute({
+      sql: `INSERT INTO rsvps (name, attending, num_persons, menu_preferences, need_accommodation, attending_church, attending_party, phone, message, invitation_code)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      args: [
+        name,
+        attending,
+        num_persons,
+        menu_preferences || "[]",
+        need_accommodation || 0,
+        attending_church || 0,
+        attending_party || 0,
+        phone || null,
+        message || null,
+        resolvedCode,
+      ],
+    });
 
     // Mark code as used and update status
     if (resolvedCode) {
       const newStatus = attending === 1 ? 'confirmed' : 'declined';
-      db.prepare("UPDATE invitation_codes SET used = 1, status = ? WHERE code = ?").run(newStatus, resolvedCode);
+      await db.execute({ sql: "UPDATE invitation_codes SET used = 1, status = ? WHERE code = ?", args: [newStatus, resolvedCode] });
     }
 
-    return NextResponse.json({ id: result.lastInsertRowid }, { status: 201 });
+    // Send confirmation SMS if phone number is provided
+    if (phone) {
+      sendConfirmationSMS(phone, name, attending === 1).catch((err) =>
+        console.error("Eroare la trimiterea SMS-ului de confirmare:", err)
+      );
+    }
+
+    return NextResponse.json({ id: Number(result.lastInsertRowid) }, { status: 201 });
   } catch (error) {
     console.error(error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });

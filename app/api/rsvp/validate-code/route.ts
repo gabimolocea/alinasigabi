@@ -1,15 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
-import db from "@/lib/db";
+import db, { dbReady } from "@/lib/db";
 
 export async function POST(request: NextRequest) {
   try {
+    await dbReady;
     const { code } = await request.json();
 
     if (!code) {
       return NextResponse.json({ valid: false, error: "Codul este obligatoriu." }, { status: 400 });
     }
 
-    const invitation = db.prepare("SELECT * FROM invitation_codes WHERE code = ?").get(code) as {
+    const result = await db.execute({ sql: "SELECT * FROM invitation_codes WHERE code = ?", args: [code] });
+    const invitation = result.rows[0] as unknown as {
       id: number;
       code: string;
       guest_name: string | null;

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import db from "@/lib/db";
+import db, { dbReady } from "@/lib/db";
 
 interface GuestRow {
   id: number;
@@ -96,15 +96,17 @@ function matchScore(query: string, guestName: string): number {
 
 export async function POST(request: NextRequest) {
   try {
+    await dbReady;
     const { name } = await request.json();
 
     if (!name || name.trim().length < 2) {
       return NextResponse.json({ guests: [] });
     }
 
-    const allGuests = db
-      .prepare("SELECT id, code, guest_name, max_persons, used FROM invitation_codes WHERE guest_name IS NOT NULL AND used = 0")
-      .all() as GuestRow[];
+    const allGuestsResult = await db.execute(
+      "SELECT id, code, guest_name, max_persons, used FROM invitation_codes WHERE guest_name IS NOT NULL AND used = 0"
+    );
+    const allGuests = allGuestsResult.rows as unknown as GuestRow[];
 
     const scored = allGuests
       .map((g) => ({

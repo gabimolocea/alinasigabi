@@ -9,8 +9,8 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@types/better-sqlite3": "^7.6.13",
-    "better-sqlite3": "^12.6.2",
+    "@aws-sdk/client-sns": "^3.1000.0",
+    "@libsql/client": "^0.17.0",
     "next": "15.3.9",
     "qrcode.react": "^4.2.0",
     "react": "^18",

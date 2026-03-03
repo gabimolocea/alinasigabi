@@ -120,7 +120,7 @@ export default function AdminPage() {
           notes: newNotes,
         }),
       });
-      const data = await res.json();
+      await res.json();
       if (res.ok) {
         setAddSuccess(`Invitatul "${newName}" a fost adăugat cu succes!`);
         setNewName("");

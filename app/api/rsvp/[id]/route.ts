@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import db from "@/lib/db";
+import db, { dbReady } from "@/lib/db";
 
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    await dbReady;
     const { id: idStr } = await params;
     const id = parseInt(idStr);
     if (isNaN(id)) {
@@ -15,10 +16,10 @@ export async function PUT(
     const body = await request.json();
     const { table_number } = body;
 
-    db.prepare("UPDATE rsvps SET table_number = ? WHERE id = ?").run(
-      table_number ?? null,
-      id
-    );
+    await db.execute({
+      sql: "UPDATE rsvps SET table_number = ? WHERE id = ?",
+      args: [table_number ?? null, id],
+    });
 
     return NextResponse.json({ success: true });
   } catch (error) {
@@ -32,13 +33,14 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    await dbReady;
     const { id: idStr } = await params;
     const id = parseInt(idStr);
     if (isNaN(id)) {
       return NextResponse.json({ error: "Invalid ID" }, { status: 400 });
     }
 
-    db.prepare("DELETE FROM rsvps WHERE id = ?").run(id);
+    await db.execute({ sql: "DELETE FROM rsvps WHERE id = ?", args: [id] });
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error(error);
