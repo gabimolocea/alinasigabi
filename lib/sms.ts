@@ -44,13 +44,14 @@ export async function sendSMS(to: string, body: string): Promise<boolean> {
 
   try {
     const normalizedTo = normalizePhone(to);
+    console.log(`📱 Trimit SMS către ${normalizedTo}...`);
     const command = new PublishCommand({
       PhoneNumber: normalizedTo,
       Message: body,
       MessageAttributes: {
         "AWS.SNS.SMS.SenderID": {
           DataType: "String",
-          StringValue: "Nunta",
+          StringValue: "AlinaSiGabi",
         },
         "AWS.SNS.SMS.SMSType": {
           DataType: "String",
@@ -59,11 +60,15 @@ export async function sendSMS(to: string, body: string): Promise<boolean> {
       },
     });
 
-    await snsClient.send(command);
-    console.log(`✅ SMS trimis cu succes către ${normalizedTo}`);
+    const result = await snsClient.send(command);
+    console.log(`✅ SMS trimis cu succes către ${normalizedTo}, MessageId: ${result.MessageId}`);
     return true;
-  } catch (error) {
-    console.error("❌ Eroare la trimiterea SMS:", error);
+  } catch (error: unknown) {
+    const err = error as Error & { name?: string; $metadata?: { httpStatusCode?: number } };
+    console.error(`❌ Eroare la trimiterea SMS către ${normalizePhone(to)}:`, err.name, err.message);
+    if (err.$metadata) {
+      console.error(`   HTTP Status: ${err.$metadata.httpStatusCode}`);
+    }
     return false;
   }
 }
