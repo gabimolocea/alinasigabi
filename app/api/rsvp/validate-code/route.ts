@@ -17,6 +17,7 @@ export async function POST(request: NextRequest) {
       guest_name: string | null;
       max_persons: number;
       used: number;
+      phone: string | null;
     } | undefined;
 
     if (!invitation) {
@@ -31,6 +32,7 @@ export async function POST(request: NextRequest) {
       valid: true,
       guest_name: invitation.guest_name,
       max_persons: invitation.max_persons,
+      phone: invitation.phone || "",
     });
   } catch (error) {
     console.error(error);

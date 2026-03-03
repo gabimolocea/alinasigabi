@@ -7,6 +7,7 @@ interface GuestRow {
   guest_name: string | null;
   max_persons: number;
   used: number;
+  phone: string | null;
 }
 
 // Remove diacritics and normalize for comparison
@@ -104,7 +105,7 @@ export async function POST(request: NextRequest) {
     }
 
     const allGuestsResult = await db.execute(
-      "SELECT id, code, guest_name, max_persons, used FROM invitation_codes WHERE guest_name IS NOT NULL AND used = 0"
+      "SELECT id, code, guest_name, max_persons, used, phone FROM invitation_codes WHERE guest_name IS NOT NULL AND used = 0"
     );
     const allGuests = allGuestsResult.rows as unknown as GuestRow[];
 
@@ -122,6 +123,7 @@ export async function POST(request: NextRequest) {
         id: g.id,
         guest_name: g.guest_name,
         max_persons: g.max_persons,
+        phone: g.phone || "",
       })),
     });
   } catch (error) {

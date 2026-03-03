@@ -21,6 +21,7 @@ interface GuestMatch {
   id: number;
   guest_name: string;
   max_persons: number;
+  phone?: string;
 }
 
 const menuLabels: Record<MenuPref, string> = {
@@ -101,7 +102,7 @@ function RSVPContent() {
 
   function selectGuest(guest: GuestMatch) {
     setSelectedGuest(guest);
-    setForm((f) => ({ ...f, name: guest.guest_name }));
+    setForm((f) => ({ ...f, name: guest.guest_name, phone: guest.phone || f.phone }));
     setGuestConfirmed(true);
     setSearchResults([]);
   }
