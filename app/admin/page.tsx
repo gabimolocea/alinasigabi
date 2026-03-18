@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import * as XLSX from "xlsx";
+import { CloverIcon } from "@/components/CloverIcon";
 import { type Locale, usePreferredLanguage } from "@/lib/language";
 
 type GuestStatus = "draft" | "invitation_sent" | "invitation_received" | "confirmed" | "declined";
@@ -640,7 +641,7 @@ export default function AdminPage() {
         <div className="max-w-sm w-full">
           <div className="bg-white rounded-sm shadow-sm p-10 gold-border">
           <div className="text-center mb-6">
-            <span className="text-[#C4BDB3] text-2xl">☘</span>
+            <CloverIcon className="h-7 w-7 text-[#C4BDB3]" />
           </div>
           <h1 className="font-playfair text-[#9B8557] text-3xl text-center mb-2">{t.title}</h1>
           <p className="font-lato text-[#7A7268] text-sm text-center mb-8">{t.subtitle}</p>

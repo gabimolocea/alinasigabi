@@ -2,6 +2,7 @@
 
 import { useState, useEffect, Suspense, useRef } from "react";
 import Link from "next/link";
+import { CloverIcon } from "@/components/CloverIcon";
 import { type Locale, usePreferredLanguage } from "@/lib/language";
 
 type MenuPref = "normal" | "vegetarian-cu-peste" | "vegetarian-fara-peste" | "vegan" | "copii";
@@ -331,7 +332,9 @@ function RSVPContent() {
       <div className="min-h-screen bg-[#F5F0EA] flex items-center justify-center px-4">
         <div className="max-w-md w-full">
           <div className="bg-white rounded-sm shadow-sm p-10 text-center gold-border-double">
-          <div className="text-4xl mb-6 text-[#C4BDB3]">☘</div>
+          <div className="mb-6 flex justify-center">
+            <CloverIcon className="h-10 w-10 text-[#C4BDB3]" />
+          </div>
           <h2 className="font-playfair text-3xl mb-4 shiny-gold">{t.thankYou}</h2>
           <p className="font-lato text-[#4A4540] text-base leading-relaxed mb-8">
             {form.attending === "no"
@@ -360,14 +363,14 @@ function RSVPContent() {
           </Link>
 
           <div className="mt-8 mb-6">
-            <span className="text-[#C4BDB3] text-3xl">☘</span>
+            <CloverIcon className="h-8 w-8 text-[#C4BDB3]" />
           </div>
 
           <h1 className="font-playfair text-4xl md:text-5xl tracking-wide mb-3 shiny-gold">{t.confirmPresence}</h1>
 
           <div className="flex items-center justify-center gap-4 mb-6">
             <div className="h-px w-16 bg-[#9B8557] opacity-40" />
-            <span className="text-[#C4BDB3] text-lg">☘</span>
+            <CloverIcon className="h-5 w-5 text-[#C4BDB3]" />
             <div className="h-px w-16 bg-[#9B8557] opacity-40" />
           </div>
 
@@ -437,12 +440,12 @@ function RSVPContent() {
           {t.back}
         </Link>
         <div className="mt-6 mb-3">
-          <span className="text-[#C4BDB3] text-2xl">☘</span>
+          <CloverIcon className="h-7 w-7 text-[#C4BDB3]" />
         </div>
         <h1 className="font-playfair text-3xl md:text-4xl tracking-wide mb-3 shiny-gold">{t.confirmPresence}</h1>
         <div className="flex items-center justify-center gap-4 mb-4">
           <div className="h-px w-16 bg-[#9B8557] opacity-40" />
-          <span className="text-[#C4BDB3] text-lg">☘</span>
+          <CloverIcon className="h-5 w-5 text-[#C4BDB3]" />
           <div className="h-px w-16 bg-[#9B8557] opacity-40" />
         </div>
         <p className="font-lato text-[#4A4540] max-w-md mx-auto text-sm leading-relaxed">
@@ -631,7 +634,10 @@ function RSVPContent() {
 
       <div className="text-center mt-8">
         <p className="font-playfair text-[#9B8557] text-xl tracking-wide">
-          Alina &amp; Gabriel <span className="text-[#C4BDB3]">☘</span>
+          <span className="inline-flex items-center gap-2">
+            <span>Alina &amp; Gabriel</span>
+            <CloverIcon className="h-4 w-4 text-[#C4BDB3]" />
+          </span>
         </p>
       </div>
     </div>

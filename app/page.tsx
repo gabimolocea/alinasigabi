@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { CloverIcon } from "@/components/CloverIcon";
 import { type Locale, usePreferredLanguage } from "@/lib/language";
 
 const homeTranslations: Record<Locale, {
@@ -115,7 +116,7 @@ export default function Home() {
             {t.confirmPresence}
           </Link>
 
-          <span className="text-[#C4BDB3] text-xl sm:text-2xl">☘</span>
+          <CloverIcon className="h-6 w-6 text-[#C4BDB3] sm:h-7 sm:w-7" />
         </div>
       </section>
     </main>
