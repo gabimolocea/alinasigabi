@@ -100,10 +100,10 @@ export default function Home() {
           </p>
 
           <div className="space-y-1 sm:space-y-2">
-            <a href="https://maps.app.goo.gl/QHfQv6YJXnMKxjbX8" target="_blank" rel="noopener noreferrer" className="block font-lato text-[#4A4540] text-base sm:text-base md:text-lg tracking-[0.1em] uppercase hover:text-[#9B8557] transition-colors">
+            <a href="https://www.google.com/maps/place/Saint+Stephen's+Church/@47.1728516,27.5713677,15.2z/data=!4m10!1m2!2m1!1sbiserica+sf+stefan+iasi!3m6!1s0x40cafb7df8d4a3ff:0x3dc42edce81504ce!8m2!3d47.1719789!4d27.5891902!15sChdiaXNlcmljYSBzZiBzdGVmYW4gaWFzaVoZIhdiaXNlcmljYSBzZiBzdGVmYW4gaWFzaZIBD29ydGhvZG94X2NodXJjaJoBJENoZERTVWhOTUc5blMwVkpRMEZuVFVSUmFYWlVObTFSUlJBQuABAPoBBAgAECI!16s%2Fg%2F1tj44dzr?entry=ttu&g_ep=EgoyMDI2MDMxNS4wIKXMDSoASAFQAw%3D%3D" target="_blank" rel="noopener noreferrer" className="block font-lato text-[#4A4540] text-base sm:text-base md:text-lg tracking-[0.1em] uppercase hover:text-[#9B8557] transition-colors">
               {t.ceremonyLabel} – <strong className="shiny-gold">12:30</strong>
             </a>
-            <a href="https://maps.app.goo.gl/YQb3kN2VVvJn8NYUA" target="_blank" rel="noopener noreferrer" className="block font-lato text-[#4A4540] text-base sm:text-base md:text-lg tracking-[0.1em] uppercase hover:text-[#9B8557] transition-colors">
+            <a href="https://www.google.com/maps/place/Pleiada+Boutique+Hotel+%26+Spa/@47.1348642,27.6049325,17z/data=!4m9!3m8!1s0x40cafbcf90a66b79:0x958842e2c5c99351!5m2!4m1!1i2!8m2!3d47.1348606!4d27.6075074!16s%2Fg%2F1q2w2jd2m?entry=ttu&g_ep=EgoyMDI2MDMxNS4wIKXMDSoASAFQAw%3D%3D" target="_blank" rel="noopener noreferrer" className="block font-lato text-[#4A4540] text-base sm:text-base md:text-lg tracking-[0.1em] uppercase hover:text-[#9B8557] transition-colors">
               {t.receptionLabel} – <strong className="shiny-gold">17:00</strong>
             </a>
           </div>
