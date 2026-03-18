@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import db, { dbReady } from "@/lib/db";
-import { sendConfirmationSMS } from "@/lib/sms";
 
 export async function GET() {
   try {
@@ -81,13 +80,6 @@ export async function POST(request: NextRequest) {
     if (resolvedCode) {
       const newStatus = attending === 1 ? 'confirmed' : 'declined';
       await db.execute({ sql: "UPDATE invitation_codes SET used = 1, status = ? WHERE code = ?", args: [newStatus, resolvedCode] });
-    }
-
-    // Send confirmation SMS if phone number is provided
-    if (phone) {
-      sendConfirmationSMS(phone, name, attending === 1).catch((err) =>
-        console.error("Eroare la trimiterea SMS-ului de confirmare:", err)
-      );
     }
 
     return NextResponse.json({ id: Number(result.lastInsertRowid) }, { status: 201 });

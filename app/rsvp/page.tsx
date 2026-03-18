@@ -50,7 +50,6 @@ const translations: Record<Locale, {
   nameLabel: string;
   phoneLabel: string;
   phonePlaceholder: string;
-  smsNotice: string;
   attendingLabel: string;
   churchOption: string;
   partyOption: string;
@@ -90,7 +89,6 @@ const translations: Record<Locale, {
     nameLabel: "Numele Dvs. / Nume Familie *",
     phoneLabel: "Număr de telefon *",
     phonePlaceholder: "07xx xxx xxx",
-    smsNotice: "📱 Vei primi un SMS de confirmare pe acest număr",
     attendingLabel: "Veți participa? *",
     churchOption: "Da, voi fi prezent(ă) la cununia religioasă",
     partyOption: "Da, voi fi prezent(ă) la petrecere",
@@ -136,7 +134,6 @@ const translations: Record<Locale, {
     nameLabel: "Your name / family name *",
     phoneLabel: "Phone number *",
     phonePlaceholder: "07xx xxx xxx",
-    smsNotice: "📱 You will receive a confirmation SMS on this number",
     attendingLabel: "Will you attend? *",
     churchOption: "Yes, I will attend the religious ceremony",
     partyOption: "Yes, I will attend the reception",
@@ -182,7 +179,6 @@ const translations: Record<Locale, {
     nameLabel: "Votre nom / nom de famille *",
     phoneLabel: "Numéro de téléphone *",
     phonePlaceholder: "07xx xxx xxx",
-    smsNotice: "📱 Vous recevrez un SMS de confirmation sur ce numéro",
     attendingLabel: "Serez-vous présent(e) ? *",
     churchOption: "Oui, je serai présent(e) à la cérémonie religieuse",
     partyOption: "Oui, je serai présent(e) à la réception",
@@ -483,9 +479,6 @@ function RSVPContent() {
             placeholder={t.phonePlaceholder}
             className="w-full bg-[#F5F0EA] border border-[#9B8557] border-opacity-30 rounded-sm px-4 py-3 font-lato text-[#4A4540] placeholder-[#7A7268] placeholder-opacity-50 focus:outline-none focus:ring-2 focus:ring-[#9B8557] focus:border-transparent transition"
           />
-          <p className="font-lato text-[#7A7268] text-xs mt-1.5 opacity-70">
-            {t.smsNotice}
-          </p>
         </div>
 
         {/* Attending */}

@@ -74,21 +74,6 @@ export async function sendSMS(to: string, body: string): Promise<boolean> {
 }
 
 /**
- * Send RSVP confirmation SMS
- */
-export async function sendConfirmationSMS(
-  phone: string,
-  name: string,
-  attending: boolean
-): Promise<boolean> {
-  const message = attending
-    ? `Draga ${name}, confirmarea ta a fost inregistrata cu succes! Te asteptam cu drag la nunta noastra pe 4 Iulie 2026. Alina & Gabriel`
-    : `Draga ${name}, am primit confirmarea ta. Ne pare rau ca nu vei putea participa, dar iti multumim pentru raspuns! Cu drag, Alina & Gabriel`;
-
-  return sendSMS(phone, message);
-}
-
-/**
  * Send wedding reminder SMS (1 week before)
  */
 export async function sendReminderSMS(
