@@ -85,6 +85,9 @@ export async function PUT(request: NextRequest) {
       }
     }
     if (guest_name !== undefined) {
+      if (!String(guest_name).trim()) {
+        return NextResponse.json({ error: "Guest name is required" }, { status: 400 });
+      }
       await db.execute({ sql: "UPDATE invitation_codes SET guest_name = ? WHERE id = ?", args: [guest_name, id] });
     }
     if (max_persons !== undefined) {

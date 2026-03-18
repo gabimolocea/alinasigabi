@@ -118,6 +118,7 @@ const adminTranslations = {
     addGuestTab: "➕ Adaugă Invitat",
     addGuestTitle: "Adaugă Invitat Nou",
     guestNameLabel: "Numele invitatului *",
+    guestNameField: "Nume invitat",
     guestNamePlaceholder: "ex: Gabriel Molocea sau Familia Molocea",
     phone: "Telefon",
     phonePlaceholder: "07xx xxx xxx",
@@ -225,6 +226,7 @@ const adminTranslations = {
     addGuestTab: "➕ Add Guest",
     addGuestTitle: "Add New Guest",
     guestNameLabel: "Guest name *",
+    guestNameField: "Guest name",
     guestNamePlaceholder: "e.g. Gabriel Molocea or Molocea Family",
     phone: "Phone",
     phonePlaceholder: "07xx xxx xxx",
@@ -332,6 +334,7 @@ const adminTranslations = {
     addGuestTab: "➕ Ajouter un invité",
     addGuestTitle: "Ajouter un nouvel invité",
     guestNameLabel: "Nom de l'invité *",
+    guestNameField: "Nom invité",
     guestNamePlaceholder: "ex. Gabriel Molocea ou Famille Molocea",
     phone: "Téléphone",
     phonePlaceholder: "07xx xxx xxx",
@@ -534,6 +537,18 @@ export default function AdminPage() {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id, table_number: tableNumber ? parseInt(tableNumber) : null }),
+    });
+    fetchGuests();
+  }
+
+  async function updateGuestName(id: number, guestName: string, originalName: string | null) {
+    const trimmedName = guestName.trim();
+    if (!trimmedName || trimmedName === (originalName || "").trim()) return;
+
+    await fetch("/api/admin/codes", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id, guest_name: trimmedName }),
     });
     fetchGuests();
   }
@@ -862,6 +877,15 @@ export default function AdminPage() {
                               <h4 className="font-lato text-[#9B8557] text-xs font-bold tracking-[0.2em] uppercase">{t.guestInfo}</h4>
 
                               <div className="grid grid-cols-2 gap-2 text-sm">
+                                <div className="col-span-2">
+                                  <span className="font-lato text-[#9B8557] text-xs opacity-60">{t.guestNameField}:</span>
+                                  <input
+                                    type="text"
+                                    defaultValue={g.guest_name || ""}
+                                    onBlur={(e) => updateGuestName(g.id, e.target.value, g.guest_name)}
+                                    className="mt-1 w-full bg-white border border-[#9B8557] border-opacity-30 rounded-sm px-3 py-2 text-sm font-lato text-[#4A4540] focus:outline-none focus:ring-1 focus:ring-[#9B8557]"
+                                  />
+                                </div>
                                 <div>
                                   <span className="font-lato text-[#9B8557] text-xs opacity-60">{t.phone}:</span>
                                   <p className="font-lato text-[#4A4540] text-sm">{g.phone || "–"}</p>
