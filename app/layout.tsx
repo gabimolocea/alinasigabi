@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { LoadingScreenRemover } from "@/components/LoadingScreenRemover";
+import { GlobalLanguageSwitcher } from "@/components/GlobalLanguageSwitcher";
+import { LanguageProvider } from "@/lib/language";
 
 export const metadata: Metadata = {
   title: "Alina & Gabriel – Nuntă 26 Iulie 2026",
@@ -24,21 +26,22 @@ export default function RootLayout({
         />
       </head>
       <body className="antialiased" suppressHydrationWarning>
-        {/* Loading Splash Screen */}
-        <div
-          id="loading-screen"
-          style={{
-            position: "fixed",
-            inset: 0,
-            zIndex: 9999,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            background: "#F5F0EA",
-            transition: "opacity 0.8s ease, visibility 0.8s ease",
-          }}
-        >
+        <LanguageProvider>
+          {/* Loading Splash Screen */}
+          <div
+            id="loading-screen"
+            style={{
+              position: "fixed",
+              inset: 0,
+              zIndex: 9999,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              background: "#F5F0EA",
+              transition: "opacity 0.8s ease, visibility 0.8s ease",
+            }}
+          >
           {/* Bride & Groom SVG */}
           <svg
             width="180"
@@ -176,11 +179,13 @@ export default function RootLayout({
               40% { transform: scale(1.2); opacity: 0.9; }
             }
           `}</style>
-        </div>
+          </div>
 
-        <LoadingScreenRemover />
+          <LoadingScreenRemover />
+          <GlobalLanguageSwitcher />
 
-        {children}
+          {children}
+        </LanguageProvider>
       </body>
     </html>
   );
