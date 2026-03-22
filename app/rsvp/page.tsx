@@ -23,6 +23,7 @@ interface GuestMatch {
   id: number;
   guest_name: string;
   max_persons: number;
+  used: number;
   phone?: string;
 }
 
@@ -40,6 +41,8 @@ const translations: Record<Locale, {
   searching: string;
   foundInviteFor: string;
   confirmIdentity: string;
+  alreadyConfirmed: string;
+  alreadyConfirmedButton: string;
   noGuestFound: string;
   connectionError: string;
   deadline: string;
@@ -79,9 +82,11 @@ const translations: Record<Locale, {
     searching: "Se caută...",
     foundInviteFor: "Am găsit invitația pentru:",
     confirmIdentity: "Confirmă identitatea",
+    alreadyConfirmed: "Această invitație a fost deja confirmată.",
+    alreadyConfirmedButton: "Deja confirmată",
     noGuestFound: "Nu am găsit niciun invitat cu acest nume. Verificați ortografia sau contactați mirii.",
     connectionError: "Eroare de conexiune.",
-    deadline: "Confirmarea prezenței până la 26 Iunie 2026",
+    deadline: "Confirmarea prezenței până la 1 Iulie 2026",
     thankYou: "Mulțumim!",
     attendingSuccess: "Ne bucurăm să vă avem alături în ziua noastră specială!",
     notAttendingSuccess: "Ne bucurăm că sunteți cu sufletul alături de noi în ziua noastră specială!",
@@ -124,9 +129,11 @@ const translations: Record<Locale, {
     searching: "Searching...",
     foundInviteFor: "We found the invitation for:",
     confirmIdentity: "Confirm identity",
+    alreadyConfirmed: "This invitation has already been confirmed.",
+    alreadyConfirmedButton: "Already confirmed",
     noGuestFound: "We couldn't find any guest with this name. Please check the spelling or contact the couple.",
     connectionError: "Connection error.",
-    deadline: "Please confirm attendance by June 26, 2026",
+    deadline: "Please confirm attendance by July 1, 2026",
     thankYou: "Thank you!",
     attendingSuccess: "We are delighted to have you with us on our special day!",
     notAttendingSuccess: "We are grateful to have your love and support with us on our special day!",
@@ -169,9 +176,11 @@ const translations: Record<Locale, {
     searching: "Recherche en cours...",
     foundInviteFor: "Nous avons trouvé l'invitation pour :",
     confirmIdentity: "Confirmer l'identité",
+    alreadyConfirmed: "Cette invitation a déjà été confirmée.",
+    alreadyConfirmedButton: "Déjà confirmée",
     noGuestFound: "Nous n'avons trouvé aucun invité avec ce nom. Vérifiez l'orthographe ou contactez les mariés.",
     connectionError: "Erreur de connexion.",
-    deadline: "Merci de confirmer votre présence avant le 26 juin 2026",
+    deadline: "Merci de confirmer votre présence avant le 1 juillet 2026",
     thankYou: "Merci !",
     attendingSuccess: "Nous sommes ravis de vous avoir à nos côtés pour notre journée spéciale !",
     notAttendingSuccess: "Nous sommes touchés de vous savoir avec nous par la pensée lors de notre journée spéciale !",
@@ -404,11 +413,21 @@ function RSVPContent() {
                 <div className="bg-[#F5F0EA] border border-[#9B8557] border-opacity-30 rounded-sm px-4 py-5">
                   <p className="font-lato text-[#7A7268] text-xs mb-2">{t.foundInviteFor}</p>
                   <p className="font-playfair text-[#9B8557] text-xl mb-4">{searchResults[0].guest_name}</p>
+                  {searchResults[0].used === 1 && (
+                    <p className="font-lato text-[#7A7268] text-sm mb-4">
+                      {t.alreadyConfirmed}
+                    </p>
+                  )}
                   <button
                     onClick={() => selectGuest(searchResults[0])}
-                    className="btn-shiny-gold font-lato tracking-[0.2em] uppercase text-sm px-8 py-2.5 font-bold rounded-sm"
+                    disabled={searchResults[0].used === 1}
+                    className={`font-lato tracking-[0.2em] uppercase text-sm px-8 py-2.5 font-bold rounded-sm ${
+                      searchResults[0].used === 1
+                        ? "bg-[#CFC7BB] text-white cursor-not-allowed"
+                        : "btn-shiny-gold"
+                    }`}
                   >
-                    {t.confirmIdentity}
+                    {searchResults[0].used === 1 ? t.alreadyConfirmedButton : t.confirmIdentity}
                   </button>
                 </div>
               </div>
