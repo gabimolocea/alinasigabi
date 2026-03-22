@@ -243,6 +243,7 @@ function RSVPContent() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const t = translations[language];
+  const maxSelectablePersons = Math.max(1, Math.min(selectedGuest?.max_persons ?? 20, 20));
 
   // Debounced fuzzy search
   useEffect(() => {
@@ -561,15 +562,25 @@ function RSVPContent() {
               <label className="block font-lato text-[#9B8557] text-xs font-bold mb-2 tracking-[0.2em] uppercase">
                 {t.personsLabel}
               </label>
-              <input
-                type="number"
-                min={1}
-                max={20}
-                required
-                value={form.num_persons}
-                onChange={(e) => handleNumPersons(parseInt(e.target.value) || 1)}
-                className="w-32 bg-[#F5F0EA] border border-[#9B8557] border-opacity-30 rounded-sm px-4 py-3 font-lato text-[#4A4540] focus:outline-none focus:ring-2 focus:ring-[#9B8557] focus:border-transparent transition"
-              />
+              <div className="relative w-40">
+                <select
+                  required
+                  value={form.num_persons}
+                  onChange={(e) => handleNumPersons(parseInt(e.target.value, 10) || 1)}
+                  className="w-full appearance-none bg-[#F5F0EA] border border-[#9B8557] border-opacity-30 rounded-sm px-4 py-3 pr-10 font-lato text-[#4A4540] focus:outline-none focus:ring-2 focus:ring-[#9B8557] focus:border-transparent transition"
+                >
+                  {Array.from({ length: maxSelectablePersons }, (_, idx) => idx + 1).map((count) => (
+                    <option key={count} value={count}>
+                      {count}
+                    </option>
+                  ))}
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                  <svg className="h-4 w-4 text-[#9B8557]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+              </div>
             </div>
 
             <div className="mb-6">
