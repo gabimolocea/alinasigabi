@@ -542,13 +542,24 @@ export default function AdminPage() {
     fetchGuests();
   }
 
-  async function updateRsvpPersons(id: number, persons: string) {
+  async function updateRsvpPersons(id: number, persons: string, currentMenus: string[]) {
     const val = persons.trim();
-    if (!val) return;
+    if (!val || parseInt(val) < 1) return;
+    const count = parseInt(val, 10);
+    const newMenus = Array.from({ length: count }, (_, i) => currentMenus[i] || "normal");
     await fetch("/api/admin/codes", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id, rsvp_persons: parseInt(val, 10) }),
+      body: JSON.stringify({ id, rsvp_persons: count, rsvp_menu: JSON.stringify(newMenus) }),
+    });
+    fetchGuests();
+  }
+
+  async function updateRsvpField(id: number, field: string, value: unknown) {
+    await fetch("/api/admin/codes", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id, [field]: value }),
     });
     fetchGuests();
   }
@@ -965,114 +976,175 @@ export default function AdminPage() {
                             {/* Right: RSVP Response */}
                             <div className="space-y-4">
                               <h4 className="font-lato text-[#9B8557] text-xs font-bold tracking-[0.2em] uppercase">{t.rsvpResponse}</h4>
-                              {!g.used ? (
-                                <p className="font-lato text-[#7A7268] text-sm italic">{t.noRsvpYet}</p>
-                              ) : (
-                                <div className="space-y-3 text-sm">
-                                  <div className="grid grid-cols-2 gap-2">
-                                    <div>
-                                      <span className="font-lato text-[#9B8557] text-xs opacity-60">{t.filledName}:</span>
-                                      <p className="font-lato text-[#4A4540]">{g.rsvp_name || "–"}</p>
-                                      {g.rsvp_name && g.guest_name && g.rsvp_name.trim().toLowerCase() !== g.guest_name.trim().toLowerCase() && (
-                                        <div className="mt-1 bg-yellow-50 border border-yellow-400 rounded-sm px-2 py-1">
-                                          <p className="font-lato text-yellow-700 text-xs">
-                                            {t.nameChanged}
-                                          </p>
-                                          <p className="font-lato text-[#7A7268] text-xs">
-                                            {t.originalName} <span className="line-through">{g.guest_name}</span>
-                                          </p>
-                                          <p className="font-lato text-[#4A4540] text-xs font-bold">
-                                            {t.newName} {g.rsvp_name}
-                                          </p>
-                                        </div>
-                                      )}
-                                    </div>
-                                    <div>
-                                      <span className="font-lato text-[#9B8557] text-xs opacity-60">{t.attending}:</span>
-                                      <p className={`font-lato font-bold ${g.rsvp_attending === 1 ? "text-green-700" : "text-red-600"}`}>
-                                        {g.rsvp_attending === 1 ? t.yes : t.no}
-                                      </p>
-                                    </div>
-                                    {g.rsvp_attending === 1 && (
-                                      <>
-                                        <div>
-                                          <span className="font-lato text-[#9B8557] text-xs opacity-60">{t.persons}:</span>
-                                          <input
-                                            type="number"
-                                            min={1}
-                                            defaultValue={g.rsvp_persons ?? ""}
-                                            onBlur={(e) => updateRsvpPersons(g.id, e.target.value)}
-                                            className="mt-1 w-20 bg-white border border-[#9B8557] border-opacity-30 rounded-sm px-3 py-1.5 text-sm font-lato text-[#4A4540] focus:outline-none focus:ring-1 focus:ring-[#9B8557]"
-                                          />
-                                        </div>
-                                        <div>
-                                          <span className="font-lato text-[#9B8557] text-xs opacity-60">{t.rsvpPhone}:</span>
-                                          <p className="font-lato text-[#4A4540]">{g.rsvp_phone || "–"}</p>
-                                        </div>
-                                      </>
+                              <div className="space-y-3 text-sm">
+                                {/* Name info */}
+                                {g.rsvp_name && (
+                                  <div>
+                                    <span className="font-lato text-[#9B8557] text-xs opacity-60">{t.filledName}:</span>
+                                    <p className="font-lato text-[#4A4540]">{g.rsvp_name}</p>
+                                    {g.guest_name && g.rsvp_name.trim().toLowerCase() !== g.guest_name.trim().toLowerCase() && (
+                                      <div className="mt-1 bg-yellow-50 border border-yellow-400 rounded-sm px-2 py-1">
+                                        <p className="font-lato text-yellow-700 text-xs">{t.nameChanged}</p>
+                                        <p className="font-lato text-[#7A7268] text-xs">{t.originalName} <span className="line-through">{g.guest_name}</span></p>
+                                        <p className="font-lato text-[#4A4540] text-xs font-bold">{t.newName} {g.rsvp_name}</p>
+                                      </div>
                                     )}
                                   </div>
+                                )}
 
-                                  {/* Accommodation - prominent */}
-                                  {g.rsvp_attending === 1 && (
-                                    <div className={`rounded-sm p-3 border ${g.rsvp_accommodation ? "bg-blue-50 border-blue-300" : "bg-[#F5F0EA] border-[#9B8557] border-opacity-10"}`}>
-                                      <span className="font-lato text-[#9B8557] text-xs font-bold tracking-[0.2em] uppercase">{t.accommodation}:</span>
-                                      <p className={`font-lato font-bold text-sm mt-0.5 ${g.rsvp_accommodation ? "text-blue-600" : "text-[#4A4540] opacity-60"}`}>
-                                        {g.rsvp_accommodation ? t.accommodationYes : t.accommodationNo}
-                                      </p>
-                                    </div>
-                                  )}
-
-                                  {/* Per-person menu breakdown - prominent */}
-                                  {g.rsvp_attending === 1 && menus.length > 0 && (
-                                    <div className={`rounded-sm p-3 border ${special ? "bg-orange-50 border-orange-300" : "bg-[#F5F0EA] border-[#9B8557] border-opacity-10"}`}>
-                                      <span className="font-lato text-[#9B8557] text-xs font-bold tracking-[0.2em] uppercase">
-                                        {t.menuPerPerson} {special && <span className="text-orange-600 ml-1">{t.specialMenuWarning}</span>}
-                                      </span>
-                                      <div className="mt-2 space-y-1">
-                                        {menus.map((m, i) => {
-                                          const isSpecialItem = m !== "normal";
-                                          return (
-                                            <div key={i} className="flex items-center gap-2">
-                                              <span className="font-lato text-[#9B8557] text-xs min-w-[80px]">{t.person} {i + 1}:</span>
-                                              <span className={`font-lato text-sm font-semibold ${isSpecialItem ? "text-orange-600" : "text-[#4A4540]"}`}>
-                                                {isSpecialItem && "🥗 "}{menuLabels[m] || m}
-                                              </span>
-                                            </div>
-                                          );
-                                        })}
-                                      </div>
-                                    </div>
-                                  )}
-
-                                  {/* Church & Party */}
-                                  {g.rsvp_attending === 1 && (
-                                    <div className="grid grid-cols-2 gap-2">
-                                      <div>
-                                        <span className="font-lato text-[#9B8557] text-xs opacity-60">{t.church}:</span>
-                                        <p className="font-lato text-[#4A4540]">{g.rsvp_church ? `✓ ${t.yes}` : `✗ ${t.no}`}</p>
-                                      </div>
-                                      <div>
-                                        <span className="font-lato text-[#9B8557] text-xs opacity-60">{t.party}:</span>
-                                        <p className="font-lato text-[#4A4540]">{g.rsvp_party ? `✓ ${t.yes}` : `✗ ${t.no}`}</p>
-                                      </div>
-                                    </div>
-                                  )}
-
-                                  {g.rsvp_message && (
-                                    <div>
-                                      <span className="font-lato text-[#9B8557] text-xs opacity-60">{t.message}:</span>
-                                      <p className="font-lato text-[#4A4540] text-sm italic bg-[#F5F0EA] rounded-sm p-2 mt-1">
-                                        &ldquo;{g.rsvp_message}&rdquo;
-                                      </p>
-                                    </div>
-                                  )}
-                                  <div>
-                                    <span className="font-lato text-[#9B8557] text-xs opacity-60">{t.rsvpDate}:</span>
-                                    <p className="font-lato text-[#4A4540] text-xs">{g.rsvp_date?.split("T")[0] || g.rsvp_date?.split(" ")[0] || "–"}</p>
+                                {/* Attending toggle */}
+                                <div>
+                                  <span className="font-lato text-[#9B8557] text-xs opacity-60 block mb-1">{t.attending}:</span>
+                                  <div className="flex gap-1.5">
+                                    <button
+                                      onClick={() => updateRsvpField(g.id, "rsvp_attending", 1)}
+                                      className={`font-lato text-xs px-3 py-1.5 rounded-sm border transition-colors ${g.rsvp_attending === 1 ? "bg-green-50 border-green-500 text-green-700 font-bold" : "border-[#9B8557] border-opacity-20 text-[#4A4540] opacity-50 hover:opacity-100"}`}
+                                    >
+                                      {t.yes}
+                                    </button>
+                                    <button
+                                      onClick={() => updateRsvpField(g.id, "rsvp_attending", 0)}
+                                      className={`font-lato text-xs px-3 py-1.5 rounded-sm border transition-colors ${g.rsvp_attending === 0 ? "bg-red-50 border-red-500 text-red-700 font-bold" : "border-[#9B8557] border-opacity-20 text-[#4A4540] opacity-50 hover:opacity-100"}`}
+                                    >
+                                      {t.no}
+                                    </button>
                                   </div>
                                 </div>
-                              )}
+
+                                {/* Persons & Phone */}
+                                <div className="grid grid-cols-2 gap-2">
+                                  <div>
+                                    <span className="font-lato text-[#9B8557] text-xs opacity-60">{t.persons}:</span>
+                                    <input
+                                      type="number"
+                                      min={1}
+                                      key={`persons-${g.id}-${g.rsvp_persons}`}
+                                      defaultValue={g.rsvp_persons ?? ""}
+                                      onBlur={(e) => updateRsvpPersons(g.id, e.target.value, menus)}
+                                      className="mt-1 w-20 bg-white border border-[#9B8557] border-opacity-30 rounded-sm px-3 py-1.5 text-sm font-lato text-[#4A4540] focus:outline-none focus:ring-1 focus:ring-[#9B8557] block"
+                                    />
+                                  </div>
+                                  <div>
+                                    <span className="font-lato text-[#9B8557] text-xs opacity-60">{t.rsvpPhone}:</span>
+                                    <input
+                                      type="tel"
+                                      key={`rsvpphone-${g.id}-${g.rsvp_phone}`}
+                                      defaultValue={g.rsvp_phone || ""}
+                                      onBlur={(e) => updateRsvpField(g.id, "rsvp_phone", e.target.value)}
+                                      className="mt-1 w-full bg-white border border-[#9B8557] border-opacity-30 rounded-sm px-3 py-1.5 text-sm font-lato text-[#4A4540] focus:outline-none focus:ring-1 focus:ring-[#9B8557] block"
+                                    />
+                                  </div>
+                                </div>
+
+                                {/* Accommodation */}
+                                <div className={`rounded-sm p-3 border ${g.rsvp_accommodation === 1 ? "bg-blue-50 border-blue-300" : "bg-[#F5F0EA] border-[#9B8557] border-opacity-10"}`}>
+                                  <span className="font-lato text-[#9B8557] text-xs font-bold tracking-[0.2em] uppercase block mb-2">{t.accommodation}:</span>
+                                  <div className="flex gap-1.5">
+                                    <button
+                                      onClick={() => updateRsvpField(g.id, "rsvp_accommodation", 1)}
+                                      className={`font-lato text-xs px-3 py-1.5 rounded-sm border transition-colors ${g.rsvp_accommodation === 1 ? "bg-blue-50 border-blue-500 text-blue-700 font-bold" : "border-[#9B8557] border-opacity-20 text-[#4A4540] opacity-50 hover:opacity-100"}`}
+                                    >
+                                      {t.yes}
+                                    </button>
+                                    <button
+                                      onClick={() => updateRsvpField(g.id, "rsvp_accommodation", 0)}
+                                      className={`font-lato text-xs px-3 py-1.5 rounded-sm border transition-colors ${g.rsvp_accommodation === 0 ? "border-[#9B8557] border-opacity-60 text-[#4A4540] font-bold" : "border-[#9B8557] border-opacity-20 text-[#4A4540] opacity-50 hover:opacity-100"}`}
+                                    >
+                                      {t.no}
+                                    </button>
+                                  </div>
+                                </div>
+
+                                {/* Menu per person */}
+                                {(g.rsvp_persons ?? 0) > 0 && (
+                                  <div className={`rounded-sm p-3 border ${special ? "bg-orange-50 border-orange-300" : "bg-[#F5F0EA] border-[#9B8557] border-opacity-10"}`}>
+                                    <span className="font-lato text-[#9B8557] text-xs font-bold tracking-[0.2em] uppercase">
+                                      {t.menuPerPerson} {special && <span className="text-orange-600 ml-1">{t.specialMenuWarning}</span>}
+                                    </span>
+                                    <div className="mt-2 space-y-2">
+                                      {Array.from({ length: g.rsvp_persons ?? 0 }, (_, i) => {
+                                        const currentMenu = menus[i] || "normal";
+                                        return (
+                                          <div key={i} className="flex items-center gap-2">
+                                            <span className="font-lato text-[#9B8557] text-xs min-w-[80px]">{t.person} {i + 1}:</span>
+                                            <select
+                                              value={currentMenu}
+                                              onChange={(e) => {
+                                                const newMenus = Array.from({ length: g.rsvp_persons ?? 1 }, (_, j) => menus[j] || "normal");
+                                                newMenus[i] = e.target.value;
+                                                updateRsvpField(g.id, "rsvp_menu", JSON.stringify(newMenus));
+                                              }}
+                                              className="bg-white border border-[#9B8557] border-opacity-30 rounded-sm px-2 py-1 text-sm font-lato text-[#4A4540] focus:outline-none focus:ring-1 focus:ring-[#9B8557]"
+                                            >
+                                              {Object.entries(menuLabels).map(([key, label]) => (
+                                                <option key={key} value={key}>{label}</option>
+                                              ))}
+                                            </select>
+                                          </div>
+                                        );
+                                      })}
+                                    </div>
+                                  </div>
+                                )}
+
+                                {/* Church & Party */}
+                                <div className="grid grid-cols-2 gap-2">
+                                  <div>
+                                    <span className="font-lato text-[#9B8557] text-xs opacity-60 block mb-1">{t.church}:</span>
+                                    <div className="flex gap-1.5">
+                                      <button
+                                        onClick={() => updateRsvpField(g.id, "rsvp_church", 1)}
+                                        className={`font-lato text-xs px-3 py-1.5 rounded-sm border transition-colors ${g.rsvp_church === 1 ? "bg-green-50 border-green-500 text-green-700 font-bold" : "border-[#9B8557] border-opacity-20 text-[#4A4540] opacity-50 hover:opacity-100"}`}
+                                      >
+                                        {t.yes}
+                                      </button>
+                                      <button
+                                        onClick={() => updateRsvpField(g.id, "rsvp_church", 0)}
+                                        className={`font-lato text-xs px-3 py-1.5 rounded-sm border transition-colors ${g.rsvp_church === 0 ? "bg-red-50 border-red-400 text-red-700 font-bold" : "border-[#9B8557] border-opacity-20 text-[#4A4540] opacity-50 hover:opacity-100"}`}
+                                      >
+                                        {t.no}
+                                      </button>
+                                    </div>
+                                  </div>
+                                  <div>
+                                    <span className="font-lato text-[#9B8557] text-xs opacity-60 block mb-1">{t.party}:</span>
+                                    <div className="flex gap-1.5">
+                                      <button
+                                        onClick={() => updateRsvpField(g.id, "rsvp_party", 1)}
+                                        className={`font-lato text-xs px-3 py-1.5 rounded-sm border transition-colors ${g.rsvp_party === 1 ? "bg-green-50 border-green-500 text-green-700 font-bold" : "border-[#9B8557] border-opacity-20 text-[#4A4540] opacity-50 hover:opacity-100"}`}
+                                      >
+                                        {t.yes}
+                                      </button>
+                                      <button
+                                        onClick={() => updateRsvpField(g.id, "rsvp_party", 0)}
+                                        className={`font-lato text-xs px-3 py-1.5 rounded-sm border transition-colors ${g.rsvp_party === 0 ? "bg-red-50 border-red-400 text-red-700 font-bold" : "border-[#9B8557] border-opacity-20 text-[#4A4540] opacity-50 hover:opacity-100"}`}
+                                      >
+                                        {t.no}
+                                      </button>
+                                    </div>
+                                  </div>
+                                </div>
+
+                                {/* Message */}
+                                <div>
+                                  <span className="font-lato text-[#9B8557] text-xs opacity-60">{t.message}:</span>
+                                  <textarea
+                                    key={`msg-${g.id}-${g.rsvp_message}`}
+                                    defaultValue={g.rsvp_message || ""}
+                                    onBlur={(e) => updateRsvpField(g.id, "rsvp_message", e.target.value)}
+                                    rows={2}
+                                    className="mt-1 w-full bg-white border border-[#9B8557] border-opacity-30 rounded-sm px-3 py-2 text-sm font-lato text-[#4A4540] focus:outline-none focus:ring-1 focus:ring-[#9B8557] resize-none block"
+                                  />
+                                </div>
+
+                                {/* RSVP Date */}
+                                {g.rsvp_date && (
+                                  <div>
+                                    <span className="font-lato text-[#9B8557] text-xs opacity-60">{t.rsvpDate}:</span>
+                                    <p className="font-lato text-[#4A4540] text-xs">{g.rsvp_date?.split("T")[0] || g.rsvp_date?.split(" ")[0]}</p>
+                                  </div>
+                                )}
+                              </div>
                             </div>
                           </div>
                         </div>

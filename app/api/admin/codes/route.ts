@@ -106,13 +106,65 @@ export async function PUT(request: NextRequest) {
         await db.execute({ sql: "UPDATE rsvps SET table_number = ? WHERE invitation_code = ?", args: [table_number || null, inv.code] });
       }
     }
-    if (body.rsvp_persons !== undefined) {
-      const invResult = await db.execute({ sql: "SELECT code FROM invitation_codes WHERE id = ?", args: [id] });
-      const inv = invResult.rows[0] as unknown as { code: string } | undefined;
-      if (inv) {
-        const persons = body.rsvp_persons ? parseInt(String(body.rsvp_persons), 10) : null;
-        await db.execute({ sql: "UPDATE rsvps SET num_persons = ? WHERE invitation_code = ?", args: [persons, inv.code] });
-        await db.execute({ sql: "UPDATE invitation_codes SET used = ? WHERE id = ?", args: [persons || 0, id] });
+    // Handle RSVP field updates (UPSERT)
+    const ALLOWED_RSVP: Record<string, string> = {
+      rsvp_attending: "attending",
+      rsvp_persons: "num_persons",
+      rsvp_phone: "phone",
+      rsvp_accommodation: "need_accommodation",
+      rsvp_church: "attending_church",
+      rsvp_party: "attending_party",
+      rsvp_menu: "menu_preferences",
+      rsvp_message: "message",
+    };
+    const rsvpUpdate: Record<string, unknown> = {};
+    for (const [bodyKey, dbCol] of Object.entries(ALLOWED_RSVP)) {
+      if (body[bodyKey] !== undefined) {
+        if (bodyKey === "rsvp_persons") {
+          rsvpUpdate[dbCol] = body[bodyKey] ? parseInt(String(body[bodyKey]), 10) : 1;
+        } else if (bodyKey === "rsvp_phone" || bodyKey === "rsvp_message") {
+          rsvpUpdate[dbCol] = body[bodyKey] || null;
+        } else {
+          rsvpUpdate[dbCol] = body[bodyKey];
+        }
+      }
+    }
+    if (Object.keys(rsvpUpdate).length > 0) {
+      const invResult2 = await db.execute({ sql: "SELECT code, guest_name FROM invitation_codes WHERE id = ?", args: [id] });
+      const inv2 = invResult2.rows[0] as unknown as { code: string; guest_name: string } | undefined;
+      if (inv2) {
+        const existing = await db.execute({ sql: "SELECT id FROM rsvps WHERE invitation_code = ?", args: [inv2.code] });
+        if (existing.rows.length === 0) {
+          const persons = (rsvpUpdate["num_persons"] as number) ?? 1;
+          const defaultMenus = JSON.stringify(Array(persons).fill("normal"));
+          await db.execute({
+            sql: `INSERT INTO rsvps (invitation_code, name, attending, num_persons, menu_preferences, need_accommodation, attending_church, attending_party, phone, message)
+                  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            args: [
+              inv2.code,
+              inv2.guest_name || "",
+              rsvpUpdate["attending"] !== undefined ? (rsvpUpdate["attending"] as number) : 1,
+              persons,
+              (rsvpUpdate["menu_preferences"] as string) ?? defaultMenus,
+              rsvpUpdate["need_accommodation"] !== undefined ? (rsvpUpdate["need_accommodation"] as number) : 0,
+              rsvpUpdate["attending_church"] !== undefined ? (rsvpUpdate["attending_church"] as number) : 0,
+              rsvpUpdate["attending_party"] !== undefined ? (rsvpUpdate["attending_party"] as number) : 1,
+              (rsvpUpdate["phone"] as string) ?? null,
+              (rsvpUpdate["message"] as string) ?? null,
+            ],
+          });
+        } else {
+          for (const [col, value] of Object.entries(rsvpUpdate)) {
+            if (Object.values(ALLOWED_RSVP).includes(col)) {
+              await db.execute({ sql: `UPDATE rsvps SET ${col} = ? WHERE invitation_code = ?`, args: [value as string | number | null, inv2.code] });
+            }
+          }
+        }
+        await db.execute({ sql: "UPDATE invitation_codes SET used = 1 WHERE id = ?", args: [id] });
+        if (rsvpUpdate["attending"] !== undefined) {
+          const newStatus = rsvpUpdate["attending"] === 1 ? "confirmed" : "declined";
+          await db.execute({ sql: "UPDATE invitation_codes SET status = ? WHERE id = ?", args: [newStatus, id] });
+        }
       }
     }
 
