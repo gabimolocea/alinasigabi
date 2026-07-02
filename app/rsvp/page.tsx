@@ -45,7 +45,6 @@ const translations: Record<Locale, {
   alreadyConfirmedButton: string;
   noGuestFound: string;
   connectionError: string;
-  deadline: string;
   thankYou: string;
   attendingSuccess: string;
   notAttendingSuccess: string;
@@ -86,7 +85,6 @@ const translations: Record<Locale, {
     alreadyConfirmedButton: "Deja confirmată",
     noGuestFound: "Nu am găsit niciun invitat cu acest nume. Verificați ortografia sau contactați mirii.",
     connectionError: "Eroare de conexiune.",
-    deadline: "Confirmarea prezenței până la 1 Iulie 2026",
     thankYou: "Mulțumim!",
     attendingSuccess: "Ne bucurăm să vă avem alături în ziua noastră specială!",
     notAttendingSuccess: "Ne bucurăm că sunteți cu sufletul alături de noi în ziua noastră specială!",
@@ -133,7 +131,6 @@ const translations: Record<Locale, {
     alreadyConfirmedButton: "Already confirmed",
     noGuestFound: "We couldn't find any guest with this name. Please check the spelling or contact the couple.",
     connectionError: "Connection error.",
-    deadline: "Please confirm attendance by July 1, 2026",
     thankYou: "Thank you!",
     attendingSuccess: "We are delighted to have you with us on our special day!",
     notAttendingSuccess: "We are grateful to have your love and support with us on our special day!",
@@ -180,7 +177,6 @@ const translations: Record<Locale, {
     alreadyConfirmedButton: "Déjà confirmée",
     noGuestFound: "Nous n'avons trouvé aucun invité avec ce nom. Vérifiez l'orthographe ou contactez les mariés.",
     connectionError: "Erreur de connexion.",
-    deadline: "Merci de confirmer votre présence avant le 1 juillet 2026",
     thankYou: "Merci !",
     attendingSuccess: "Nous sommes ravis de vous avoir à nos côtés pour notre journée spéciale !",
     notAttendingSuccess: "Nous sommes touchés de vous savoir avec nous par la pensée lors de notre journée spéciale !",
@@ -444,9 +440,6 @@ function RSVPContent() {
             )}
           </div>
 
-          <p className="font-lato text-[#7A7268] text-xs mt-6">
-            {t.deadline}
-          </p>
         </div>
       </div>
     );
