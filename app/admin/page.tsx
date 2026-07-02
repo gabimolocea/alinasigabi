@@ -542,6 +542,17 @@ export default function AdminPage() {
     fetchGuests();
   }
 
+  async function updateRsvpPersons(id: number, persons: string) {
+    const val = persons.trim();
+    if (!val) return;
+    await fetch("/api/admin/codes", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id, rsvp_persons: parseInt(val, 10) }),
+    });
+    fetchGuests();
+  }
+
   async function updateGuestName(id: number, guestName: string, originalName: string | null) {
     const trimmedName = guestName.trim();
     if (!trimmedName || trimmedName === (originalName || "").trim()) return;
@@ -986,7 +997,13 @@ export default function AdminPage() {
                                       <>
                                         <div>
                                           <span className="font-lato text-[#9B8557] text-xs opacity-60">{t.persons}:</span>
-                                          <p className="font-lato text-[#4A4540]">{g.rsvp_persons}</p>
+                                          <input
+                                            type="number"
+                                            min={1}
+                                            defaultValue={g.rsvp_persons ?? ""}
+                                            onBlur={(e) => updateRsvpPersons(g.id, e.target.value)}
+                                            className="mt-1 w-20 bg-white border border-[#9B8557] border-opacity-30 rounded-sm px-3 py-1.5 text-sm font-lato text-[#4A4540] focus:outline-none focus:ring-1 focus:ring-[#9B8557]"
+                                          />
                                         </div>
                                         <div>
                                           <span className="font-lato text-[#9B8557] text-xs opacity-60">{t.rsvpPhone}:</span>

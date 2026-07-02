@@ -106,6 +106,15 @@ export async function PUT(request: NextRequest) {
         await db.execute({ sql: "UPDATE rsvps SET table_number = ? WHERE invitation_code = ?", args: [table_number || null, inv.code] });
       }
     }
+    if (body.rsvp_persons !== undefined) {
+      const invResult = await db.execute({ sql: "SELECT code FROM invitation_codes WHERE id = ?", args: [id] });
+      const inv = invResult.rows[0] as unknown as { code: string } | undefined;
+      if (inv) {
+        const persons = body.rsvp_persons ? parseInt(String(body.rsvp_persons), 10) : null;
+        await db.execute({ sql: "UPDATE rsvps SET num_persons = ? WHERE invitation_code = ?", args: [persons, inv.code] });
+        await db.execute({ sql: "UPDATE invitation_codes SET used = ? WHERE id = ?", args: [persons || 0, id] });
+      }
+    }
 
     return NextResponse.json({ success: true });
   } catch (error) {
