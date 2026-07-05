@@ -86,7 +86,7 @@ export default function Home() {
                 {t.andGodparents}
               </p>
               <p className="font-lato shiny-gold text-[16px] sm:text-base md:text-lg font-bold tracking-wide">
-                Diana și George Stamati
+                Ana și Sebastian Cojocaru
               </p>
             </div>
           </div>
